@@ -4,9 +4,9 @@
 
 ## Synopsis
 
-Output the following:
-1. valid
-   * `true` if checksums with matching keys are identical
+1. Generate a checksum from either a string or shell command.
+2. Validate if checksum is identical to input (even across multiple jobs), using a `key` to link the validation attempt with the correct generated checksum.
+   * Validation is possible across jobs since the checksum is uploaded as a workflow artifact
 
 ## Usage
 
@@ -19,13 +19,13 @@ jobs:
       - uses: actions/checkout@v4.1.1
 
       - name: Generate checksum of string
-        uses: ./
+        uses: JosiahSiegel/checksum-validate-action@v1
         with:
           key: test string
           input: hello world
 
       - name: Generate checksum of command output
-        uses: ./
+        uses: JosiahSiegel/checksum-validate-action@v1
         with:
           key: test command
           input: cat action.yml
@@ -40,7 +40,7 @@ jobs:
 
       - name: Validate checksum of valid string
         id: valid-string
-        uses: ./
+        uses: JosiahSiegel/checksum-validate-action@v1
         with:
           key: test string
           validate: true
@@ -49,7 +49,7 @@ jobs:
 
       - name: Validate checksum of valid command output
         id: valid-command
-        uses: ./
+        uses: JosiahSiegel/checksum-validate-action@v1
         with:
           key: test command
           validate: true
@@ -64,75 +64,31 @@ jobs:
 
 ## Workflow summary
 
-### :construction: Terraform Stats :construction:
+### ✅ test string checksum valid ✅
 
-* change-count: 2
-* change-percent: 100
-* resource-changes:
-```json
-[
-  {
-    "address": "docker_container.nginx",
-    "changes": [
-      "create"
-    ]
-  },
-  {
-    "address": "docker_image.nginx",
-    "changes": [
-      "create"
-    ]
-  }
-]
-```
+### ❌ test string checksum INVALID ❌
 
 ## Inputs
 
 ```yml
 inputs:
-  terraform-directory:
-    description: Terraform commands will run in this location.
-    required: true
-    default: "./terraform"
-  include-no-op:
-    description: "\"no-op\" refers to the before and after Terraform changes are identical as a value will only be known after apply."
-    required: true
+  validate:
+    description: Check if checksums match
     default: false
-  add-args:
-    description: Pass additional arguments to Terraform plan.
+  key:
+    description: String to keep unique checksums separate
     required: true
-    default: ""
-  upload-plan:
-    description: Upload plan file. true or false
-    required: true
+  fail-invalid:
+    description: Fail step if invalid checksum
     default: false
-  upload-retention-days:
-    description: Number of days to keep uploaded plan.
+  input:
+    description: String or command for checksum
     required: true
-    default: 7
-  plan-file:
-    description: Name of plan file.
-    required: true
-    default: tf__stats__plan.bin
-  terraform-version:
-    description: Specify a specific version of Terraform
-    required: true
-    default: latest
 ```
 
 ## Outputs
 ```yml
 outputs:
-  terraform-version:
-    description: 'Terraform version'
-  drift-count:
-    description: 'Count of drifts'
-  resource-drifts:
-    description: 'JSON output of resource drifts'
-  change-count:
-    description: 'Count of changes'
-  change-percent:
-    description: 'Percentage of changes to total resources'
-  resource-changes:
-    description: 'JSON output of resource changes'
+  valid:
+    description: True if checksums match
 ```
