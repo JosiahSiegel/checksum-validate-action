@@ -68,7 +68,7 @@ jobs:
           fail-invalid: true
           input: cat action.yml
       - name: Fail if output of valid command is wrong
-        if: steps.valid-string.outputs.valid != 'true'
+        if: steps.valid-command.outputs.valid != 'true'
         run: exit 1
 
       - name: Validate checksum of INVALID command output
@@ -80,7 +80,7 @@ jobs:
           fail-invalid: false
           input: cat README.md
       - name: Fail if output of INVALID command is wrong
-        if: steps.invalid-string.outputs.valid != 'false'
+        if: steps.invalid-command.outputs.valid != 'false'
         run: exit 1
 
   validate-checksum-failures:
@@ -96,7 +96,6 @@ jobs:
 
       - name: Validate checksum of INVALID string
         continue-on-error: true
-        id: invalid-string
         uses: ./
         with:
           key: test string
@@ -106,7 +105,6 @@ jobs:
 
       - name: Validate checksum of INVALID command output
         continue-on-error: true
-        id: invalid-command
         uses: ./
         with:
           key: test command
