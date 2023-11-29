@@ -4,7 +4,7 @@
 
 ## Synopsis
 
-1. Generate a checksum from either a string or shell command (prepend with `$`).
+1. Generate a checksum from either a string or shell command (use command substitution: `$()`).
 2. Validate if checksum is identical to input (even across multiple jobs), using a `key` to link the validation attempt with the correct generated checksum.
    * Validation is possible across jobs since the checksum is uploaded as a workflow artifact
 
@@ -28,7 +28,7 @@ jobs:
         uses: JosiahSiegel/checksum-validate-action@v1
         with:
           key: test command
-          input: $cat action.yml
+          input: $(cat action.yml)
 
   validate-checksums:
     name: Validate checksum
@@ -54,7 +54,7 @@ jobs:
           key: test command
           validate: true
           fail-invalid: true
-          input: $cat action.yml
+          input: $(cat action.yml)
 
       - name: Get outputs
         run: |
