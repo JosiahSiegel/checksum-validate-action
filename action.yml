@@ -34,7 +34,7 @@ runs:
         if [[ "${{ inputs.input }}" =~ ^\$ ]]
         then
           # Remove the leading $
-          input_cmd=${{ inputs.input }}[1:]
+          input_cmd="${{ inputs.input }}[1:]"
           # Execute the command and get the SHA
           sha="$($input_cmd | sha256sum)"
         else

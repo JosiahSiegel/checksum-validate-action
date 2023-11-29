@@ -22,7 +22,7 @@ jobs:
         uses: ./
         with:
           key: test command
-          input: cat action.yml
+          input: $cat action.yml
 
   validate-checksums:
     name: Test validate checksum on ${{ matrix.os }}
@@ -66,7 +66,7 @@ jobs:
           key: test command
           validate: true
           fail-invalid: true
-          input: cat action.yml
+          input: $cat action.yml
       - name: Fail if output of valid command is wrong
         if: steps.valid-command.outputs.valid != 'true'
         run: exit 1
@@ -78,7 +78,7 @@ jobs:
           key: test command
           validate: true
           fail-invalid: false
-          input: cat README.md
+          input: $cat README.md
       - name: Fail if output of INVALID command is wrong
         if: steps.invalid-command.outputs.valid != 'false'
         run: exit 1
@@ -110,4 +110,4 @@ jobs:
           key: test command
           validate: true
           fail-invalid: true
-          input: cat README.md
+          input: $cat README.md
