@@ -30,17 +30,8 @@ runs:
       id: input_sha
       shell: bash
       run: |
-        # Check if input is a command or a string
-        if [[ "${{ inputs.input }}" =~ ^\$ ]]
-        then
-          # Remove the leading $
-          input_cmd=${{ inputs.input }}[1:]
-          # Execute the command and get the SHA
-          sha="$($input_cmd | sha256sum)"
-        else
-          # Get the SHA of the input string
-          sha=$(echo "${{ inputs.input }}" | sha256sum)
-        fi
+        input_cmd="${{ inputs.input }}"
+        sha="$(echo "$input_cmd" | sha256sum)"
         echo "sha=$sha" >> $GITHUB_OUTPUT
 
     - name: Create checksum file
