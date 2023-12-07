@@ -1,6 +1,12 @@
 name: Test Action
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   generate-checksums:
@@ -22,7 +28,7 @@ jobs:
         uses: ./
         with:
           key: test command
-          input: $(cat action.yml)
+          input: $(cat actions.yml)
 
   validate-checksums:
     name: Test validate checksum on ${{ matrix.os }}
