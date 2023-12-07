@@ -72,7 +72,7 @@ runs:
       if: inputs.validate == 'true'
       run: |
         # Use ternary operator to assign emoji based on validity
-        emoji=${{ steps.validate_checksum.outputs.valid == 'true' && ':white_check_mark:' || ':x:' }}
+        emoji=${{ steps.validate_checksum.outputs.valid == 'true' && '✅' || '❌' }}
         valid=${{ steps.validate_checksum.outputs.valid == 'true' && 'valid' || 'INVALID' }}
         echo "### $emoji ${{ inputs.key }} checksum $valid $emoji" >> $GITHUB_STEP_SUMMARY
       shell: bash
