@@ -1,0 +1,42 @@
+# action.yml
+name: Checksum
+inputs:
+  input:
+    required: true
+outputs:
+  sha:
+    value: ${{ steps.input_sha.outputs.sha }}
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Generate SHA
+      uses: nick-fields/retry@v2.9.0
+      with:
+        max_attempts: 5
+        retry_on: any
+        timeout_seconds: 10
+        retry_wait_seconds: 15
+        command: |
+          function fail {
+              printf '%s\n' "$1" >&2
+              exit "${2-1}"
+          }
+          input_cmd="${{ inputs.input }}" || fail
+          sha="$(echo "$input_cmd" | sha256sum)"
+          echo "sha=$sha" >> $GITHUB_ENV
+          echo "success=true" >> $GITHUB_ENV
+
+    - name: Get input SHA
+      if: env.success
+      id: input_sha
+      shell: bash
+      run: echo "sha=${{ env.sha }}" >> $GITHUB_OUTPUT
+
+    - name: Get input SHA
+      if: env.success != 'true'
+      shell: bash
+      run: |
+        echo "failed to generate sha"
+        exit 1

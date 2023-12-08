@@ -20,64 +20,34 @@ inputs:
 outputs:
   valid:
     description: True if checksums match
-    value: ${{ steps.validate_checksum.outputs.valid }}
+    value: ${{ steps.validate_file.outputs.valid }}
 
 runs:
   using: "composite"
   steps:
 
     - name: Get input SHA
-      id: input_sha
-      shell: bash
-      run: |
-        input_cmd="${{ inputs.input }}"
-        sha="$(echo "$input_cmd" | sha256sum)"
-        echo "sha=$sha" >> $GITHUB_OUTPUT
-
-    - name: Create checksum file
-      if: inputs.validate != 'true'
-      shell: bash
-      run: |
-        echo "${{ steps.input_sha.outputs.sha }}" > "${{ github.sha }}-${{ inputs.key }}.txt"
+      id: get_sha
+      uses: ./.github/actions/checksum
+      with:
+        input: ${{ inputs.input }}
 
     - name: Upload checksum file
       if: inputs.validate != 'true'
-      uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32
+      uses: ./.github/actions/upload-file
       with:
-        name: ${{ github.sha }}-${{ inputs.key }}.txt
-        path: ${{ github.sha }}-${{ inputs.key }}.txt
-        retention-days: 5
+        sha: ${{ steps.get_sha.outputs.sha }}
+        key: ${{ inputs.key }}
 
-    - name: Download checksum file
+    - name: Validate checksum file
       if: inputs.validate == 'true'
-      uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a
+      id: validate_file
+      uses: ./.github/actions/validate-file
       with:
-        name: ${{ github.sha }}-${{ inputs.key }}.txt
-
-    - name: Validate pre and post checksums
-      if: inputs.validate == 'true'
-      id: validate_checksum
-      shell: bash
-      run: |
-        echo "${{ steps.input_sha.outputs.sha }}" > "${{ github.sha }}-${{ inputs.key }}-2.txt"
-        DIFF=$(diff -q "${{ github.sha }}-${{ inputs.key }}-2.txt" "${{ github.sha }}-${{ inputs.key }}.txt") || true
-        codevalid=true
-        if [ "$DIFF" != "" ]
-        then
-          codevalid=false
-        fi
-        echo "valid=$codevalid" >> $GITHUB_OUTPUT
-
-    - name: Create summary
-      if: inputs.validate == 'true'
-      run: |
-        # Use ternary operator to assign emoji based on validity
-        emoji=${{ steps.validate_checksum.outputs.valid == 'true' && '✅' || '❌' }}
-        valid=${{ steps.validate_checksum.outputs.valid == 'true' && 'valid' || 'INVALID' }}
-        echo "### $emoji ${{ inputs.key }} checksum $valid $emoji" >> $GITHUB_STEP_SUMMARY
-      shell: bash
+        sha: ${{ steps.get_sha.outputs.sha }}
+        key: ${{ inputs.key }}
 
     - name: Fail if invalid checksum
-      if: inputs.validate == 'true' && steps.validate_checksum.outputs.valid != 'true' && inputs.fail-invalid == 'true'
+      if: inputs.validate == 'true' && steps.validate_file.outputs.valid != 'true' && inputs.fail-invalid == 'true'
       run: exit 1
       shell: bash
