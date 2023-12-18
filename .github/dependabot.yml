@@ -11,8 +11,3 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-  # GitHub local actions
-  - package-ecosystem: "github-actions"
-    directory: "action.yml"
-    schedule:
-      interval: "daily"
