@@ -67,19 +67,19 @@ runs:
 
     - name: Upload checksum file
       if: inputs.validate != 'true'
-      uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32
+      uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392
       with:
-        name: ${{ github.sha }}-${{ inputs.key }}.txt
-        path: ${{ github.sha }}-${{ inputs.key }}.txt
+        name: "${{ github.sha }}-${{ inputs.key }}.txt"
+        path: "${{ github.sha }}-${{ inputs.key }}.txt"
         retention-days: 5
     # UPLOAD FILE END
 
     # VALIDATE FILE START
     - name: Download checksum file
       if: inputs.validate == 'true'
-      uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a
+      uses: actions/download-artifact@f44cd7b40bfd40b6aa1cc1b9b5b7bf03d3c67110
       with:
-        name: ${{ github.sha }}-${{ inputs.key }}.txt
+        name: "${{ github.sha }}-${{ inputs.key }}.txt"
 
     - name: Validate pre and post checksums
       if: inputs.validate == 'true'
